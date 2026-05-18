@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corporate RAG GUI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #111827;
+            color: #f3f4f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            flex-1: 1;
+            height: 90%;
+        }
+        header {
+            text-align: center;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        h1 { color: #2dd4bf; margin: 0; font-size: 24px; }
+        p { color: #9ca3af; margin: 5px 0 0 0; font-size: 14px; }
+        #chat-box {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #374151;
+            background-color: #1f2937;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .msg { padding: 10px 14px; rounded-radius: 6px; max-width: 80%; font-size: 14px; line-height: 1.5; border-radius: 8px; }
+        .user { background-color: #0d9488; align-self: flex-end; color: white; }
+        .bot { background-color: #1f2937; border: 1px solid #4b5563; align-self: flex-start; }
+        .sources { font-size: 11px; color: #9ca3af; border-top: 1px solid #4b5563; margin-top: 8px; padding-top: 6px; }
+        .source-title { color: #2dd4bf; font-weight: bold; }
+        #loading { color: #2dd4bf; font-size: 13px; font-style: italic; display: none; margin-bottom: 5px; }
+        .input-area { display: flex; gap: 10px; }
+        input {
+            flex: 1;
+            background-color: #374151;
+            border: 1px solid #4b5563;
+            border-radius: 6px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+        }
+        input:focus { outline: 1px solid #2dd4bf; }
+        button {
+            background-color: #0d9488;
+            color: white;
+            border: none;
+            padding: 0 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #14b8a6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>💼 Corporate RAG Chatbot</h1>
+        <p>GUI Standar (Vanilla JS) menembak Local FastAPI & Phi-3</p>
+    </header>
+
+    <!-- Kotak Chat -->
+    <div id="chat-box"></div>
+    
+    <!-- Status Loading -->
+    <div id="loading">Sedang membaca PDF dan merangkum jawaban via GPU...</div>
+
+    <!-- Area Input -->
+    <div class="input-area">
+        <input type="text" id="query-input" placeholder="Tanya laba bersih, aset, modal, dll..." onkeypress="handleKeyPress(event)">
+        <button onclick="kirimPertanyaan()">Kirim</button>
+    </div>
+</div>
+
+<script>
+    async function kirimPertanyaan() {
+        const inputField = document.getElementById('query-input');
+        const chatBox = document.getElementById('chat-box');
+        const loadingText = document.getElementById('loading');
+        const question = inputField.value.trim();
+
+        if (!question) return;
+
+        // 1. Tampilkan pertanyaan User di layar
+        chatBox.innerHTML += `<div class="msg user">${question}</div>`;
+        inputField.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // 2. Munculkan loading anim
+        loadingText.style.display = 'block';
+
+        try {
+            // 3. Tembak API FastAPI lokal menggunakan FETCH bawaan browser
+            const response = await fetch('http://localhost:8000/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ question: question })
+            });
+            const data = await response.json();
+
+            // 4. Susun teks sumber/contekan PDF dokumen
+            let sourcesHTML = '';
+            if (data.sources && data.sources.length > 0) {
+                sourcesHTML += `<div class="sources"><span class="source-title">🔍 Sumber Dokumen:</span>`;
+                data.sources.forEach(src => {
+                    // Ambil nama file saja tanpa path lengkap folder
+                    const fileName = src.file.replace(/^.*[\\/]/, '');
+                    sourcesHTML += `<div>📄 ${fileName} (Halaman ${src.page})</div>`;
+                });
+                sourcesHTML += `</div>`;
+            }
+
+            // 5. Tampilkan jawaban Bot di layar
+            chatBox.innerHTML += `
+                <div class="msg bot">
+                    <div>${data.answer}</div>
+                    ${sourcesHTML}
+                </div>
+            `;
+
+        } catch (error) {
+            chatBox.innerHTML += `<div class="msg bot" style="color:#ef4444;">Waduh eror! Server backend api.py belum kamu nyalain le.</div>`;
+        } finally {
+            // 6. Matikan loading dan scroll ke bawah otomatis
+            loadingText.style.display = 'none';
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    }
+
+    // Fungsi biar bisa kirim pakai tombol Enter di keyboard
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            kirimPertanyaan();
+        }
+    }
+</script>
+
+</body>
+</html>
