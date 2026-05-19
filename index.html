@@ -3,97 +3,209 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Corporate RAG GUI</title>
+    <title>Corporate RAG Platform</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #111827;
-            color: #f3f4f6;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            box-sizing: border-box;
         }
         .container {
-            max-width: 800px;
+            max-width: 900px;
             width: 100%;
-            margin: 0 auto;
+            height: 90vh;
+            margin: 20px;
+            background-color: #1e293b;
+            border-radius: 12px;
+            border: 1px solid #334155;
             display: flex;
             flex-direction: column;
-            flex-1: 1;
-            height: 90%;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
         }
         header {
-            text-align: center;
-            border-bottom: 1px solid #374151;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
+            padding: 20px 24px;
+            background-color: #1e293b;
+            border-bottom: 1px solid #334155;
         }
-        h1 { color: #2dd4bf; margin: 0; font-size: 24px; }
-        p { color: #9ca3af; margin: 5px 0 0 0; font-size: 14px; }
+        h1 { 
+            color: #2dd4bf; 
+            margin: 0; 
+            font-size: 22px; 
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+        p { 
+            color: #94a3b8; 
+            margin: 6px 0 0 0; 
+            font-size: 13px; 
+        }
         #chat-box {
             flex: 1;
             overflow-y: auto;
-            border: 1px solid #374151;
-            background-color: #1f2937;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
+            background-color: #0f172a;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
         }
-        .msg { padding: 10px 14px; rounded-radius: 6px; max-width: 80%; font-size: 14px; line-height: 1.5; border-radius: 8px; }
-        .user { background-color: #0d9488; align-self: flex-end; color: white; }
-        .bot { background-color: #1f2937; border: 1px solid #4b5563; align-self: flex-start; }
-        .sources { font-size: 11px; color: #9ca3af; border-top: 1px solid #4b5563; margin-top: 8px; padding-top: 6px; }
-        .source-title { color: #2dd4bf; font-weight: bold; }
-        #loading { color: #2dd4bf; font-size: 13px; font-style: italic; display: none; margin-bottom: 5px; }
-        .input-area { display: flex; gap: 10px; }
+        /* Kustomisasi Scrollbar */
+        #chat-box::-webkit-scrollbar {
+            width: 6px;
+        }
+        #chat-box::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        #chat-box::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 3px;
+        }
+        .msg { 
+            padding: 12px 16px; 
+            max-width: 75%; 
+            font-size: 14px; 
+            line-height: 1.6; 
+            border-radius: 8px; 
+            animation: fadeIn 0.2s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .user { 
+            background-color: #0f766e; 
+            align-self: flex-end; 
+            color: #f8fafc; 
+            border-bottom-right-radius: 2px;
+        }
+        .bot { 
+            background-color: #1e293b; 
+            border: 1px solid #334155; 
+            align-self: flex-start; 
+            border-bottom-left-radius: 2px;
+        }
+        .sources { 
+            font-size: 12px; 
+            color: #94a3b8; 
+            border-top: 1px solid #334155; 
+            margin-top: 12px; 
+            padding-top: 8px; 
+        }
+        .source-title { 
+            color: #2dd4bf; 
+            font-weight: 500; 
+            display: block;
+            margin-bottom: 4px;
+        }
+        .source-item {
+            display: block;
+            margin-top: 2px;
+            color: #cbd5e1;
+        }
+        #loading { 
+            color: #2dd4bf; 
+            font-size: 13px; 
+            padding: 0 24px 12px 24px;
+            background-color: #0f172a;
+            font-style: italic; 
+            display: none; 
+        }
+        .input-area { 
+            display: flex; 
+            flex-direction: column;
+            gap: 12px; 
+            padding: 16px 24px;
+            background-color: #1e293b;
+            border-top: 1px solid #334155;
+        }
+        .control-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .control-panel label {
+            font-size: 13px;
+            color: #94a3b8;
+        }
+        select {
+            background-color: #0f172a;
+            color: #f8fafc;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.15s ease;
+        }
+        select:focus {
+            border-color: #2dd4bf;
+        }
+        .interactive-form {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
         input {
             flex: 1;
-            background-color: #374151;
-            border: 1px solid #4b5563;
+            background-color: #0f172a;
+            border: 1px solid #334155;
             border-radius: 6px;
-            padding: 12px;
-            color: white;
+            padding: 12px 16px;
+            color: #f8fafc;
             font-size: 14px;
+            transition: border-color 0.15s ease;
         }
-        input:focus { outline: 1px solid #2dd4bf; }
+        input:focus { 
+            outline: none;
+            border-color: #2dd4bf; 
+        }
         button {
             background-color: #0d9488;
-            color: white;
+            color: #f8fafc;
             border: none;
             padding: 0 24px;
             border-radius: 6px;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 500;
             font-size: 14px;
-            transition: background 0.2s;
+            transition: background-color 0.15s ease;
         }
-        button:hover { background-color: #14b8a6; }
+        button:hover { 
+            background-color: #14b8a6; 
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>💼 Corporate RAG Chatbot</h1>
-        <p>GUI Standar (Vanilla JS) menembak Local FastAPI & Phi-3</p>
+        <h1>Corporate Retrieval-Augmented Generation</h1>
+        <p>Sistem pencarian berbasis dokumen lokal dan model bahasa komputasi internal</p>
     </header>
 
-    <!-- Kotak Chat -->
     <div id="chat-box"></div>
     
-    <!-- Status Loading -->
-    <div id="loading">Sedang membaca PDF dan merangkum jawaban via GPU...</div>
+    <div id="loading">Memproses dokumen dan menyusun jawaban melalui infrastruktur lokal...</div>
 
-    <!-- Area Input -->
     <div class="input-area">
-        <input type="text" id="query-input" placeholder="Tanya laba bersih, aset, modal, dll..." onkeypress="handleKeyPress(event)">
-        <button onclick="kirimPertanyaan()">Kirim</button>
+        <div class="control-panel">
+            <label for="mode-select">Basis Pengetahuan:</label>
+            <select id="mode-select">
+                <option value="rag">Dokumen Lokal (Qdrant)</option>
+                <option value="general">Pengetahuan Umum (Phi-3 Mini Bawaan)</option>
+            </select>
+        </div>
+        <div class="interactive-form">
+            <input type="text" id="query-input" placeholder="Masukkan kata kunci atau pertanyaan analisis di sini..." onkeypress="handleKeyPress(event)">
+            <button onclick="kirimPertanyaan()">Kirim</button>
+        </div>
     </div>
 </div>
 
@@ -102,40 +214,40 @@
         const inputField = document.getElementById('query-input');
         const chatBox = document.getElementById('chat-box');
         const loadingText = document.getElementById('loading');
+        const modeSelect = document.getElementById('mode-select');
+        
         const question = inputField.value.trim();
+        const selectedMode = modeSelect.value;
 
         if (!question) return;
 
-        // 1. Tampilkan pertanyaan User di layar
         chatBox.innerHTML += `<div class="msg user">${question}</div>`;
         inputField.value = '';
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        // 2. Munculkan loading anim
         loadingText.style.display = 'block';
 
         try {
-            // 3. Tembak API FastAPI lokal menggunakan FETCH bawaan browser
             const response = await fetch('http://localhost:8000/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ question: question })
+                body: JSON.stringify({ 
+                    question: question,
+                    mode: selectedMode
+                })
             });
             const data = await response.json();
 
-            // 4. Susun teks sumber/contekan PDF dokumen
             let sourcesHTML = '';
-            if (data.sources && data.sources.length > 0) {
-                sourcesHTML += `<div class="sources"><span class="source-title">🔍 Sumber Dokumen:</span>`;
+            if (selectedMode === 'rag' && data.sources && data.sources.length > 0) {
+                sourcesHTML += `<div class="sources"><span class="source-title">Referensi Dokumen:</span>`;
                 data.sources.forEach(src => {
-                    // Ambil nama file saja tanpa path lengkap folder
                     const fileName = src.file.replace(/^.*[\\/]/, '');
-                    sourcesHTML += `<div>📄 ${fileName} (Halaman ${src.page})</div>`;
+                    sourcesHTML += `<span class="source-item">Berkas: ${fileName} (Halaman ${src.page})</span>`;
                 });
                 sourcesHTML += `</div>`;
             }
 
-            // 5. Tampilkan jawaban Bot di layar
             chatBox.innerHTML += `
                 <div class="msg bot">
                     <div>${data.answer}</div>
@@ -144,15 +256,13 @@
             `;
 
         } catch (error) {
-            chatBox.innerHTML += `<div class="msg bot" style="color:#ef4444;">Waduh eror! Server backend api.py belum kamu nyalain le.</div>`;
+            chatBox.innerHTML += `<div class="msg bot" style="color: #f87171;">Gagal terhubung dengan layanan backend. Pastikan server API lokal Anda telah aktif.</div>`;
         } finally {
-            // 6. Matikan loading dan scroll ke bawah otomatis
             loadingText.style.display = 'none';
             chatBox.scrollTop = chatBox.scrollHeight;
         }
     }
 
-    // Fungsi biar bisa kirim pakai tombol Enter di keyboard
     function handleKeyPress(event) {
         if (event.key === 'Enter') {
             kirimPertanyaan();
