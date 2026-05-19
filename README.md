@@ -1,4 +1,4 @@
-# Corporate & Academic RAG Chatbot using Phi-3 Mini & FastAPI
+# RAG Chatbot using Phi-3 Mini & FastAPI
 
 Proyek ini adalah sistem *Retrieval-Augmented Generation* (RAG) yang berjalan 100% secara lokal dan luring (offline). Sistem ini dirancang untuk melakukan analisis dokumen teks, jurnal ilmiah, hingga artikel web secara aman tanpa membocorkan data ke pihak ketiga. Dilengkapi dengan fitur **Dual Mode**, pengguna dapat secara dinamis memilih antara basis pengetahuan dokumen lokal yang ketat atau memanfaatkan memori pengetahuan umum bawaan dari model bahasa secara luwes.
 
